@@ -1,0 +1,131 @@
+{
+  "target": "bmv2",
+  "p4info": "build/basic_tunnel.p4.p4info.txt",
+  "bmv2_json": "build/basic_tunnel.json",
+  "table_entries": [
+    {
+      "table": "ingress.arp_out",
+      "match": {
+          "hdr.arp.protoDstAddr": "10.0.1.1"
+      },
+	"action_name": "ingress.set_arp_out",
+	"action_params": {
+	    "port": 1
+      }
+    },
+    {
+      "table": "ingress.arp_out",
+      "match": {
+          "hdr.arp.protoDstAddr": "10.0.1.2"
+      },
+	"action_name": "ingress.set_arp_out",
+	"action_params": {
+	    "port": 2
+      }
+    },
+    {
+      "table": "ingress.arp_out",
+      "match": {
+          "hdr.arp.protoDstAddr": "10.0.1.3"
+      },
+	"action_name": "ingress.set_arp_out",
+	"action_params": {
+	    "port": 3
+	}
+    },
+    {
+      "table": "egress.send_frame",
+      "match": {
+          "standard_metadata.ingress_port": 1
+      },
+      "action_name": "egress.rewrite_mac",
+      "action_params": {
+        "smac": "00:00:00:00:01:01"
+      }
+    },
+    {
+      "table": "egress.send_frame",
+      "match": {
+          "standard_metadata.ingress_port": 2
+      },
+      "action_name": "egress.rewrite_mac",
+      "action_params": {
+        "smac": "00:00:00:00:01:02"
+      }
+    },
+    {
+      "table": "egress.send_frame",
+      "match": {
+          "standard_metadata.ingress_port": 3
+      },
+      "action_name": "egress.rewrite_mac",
+      "action_params": {
+        "smac": "00:00:00:00:01:03"
+      }
+    },
+    {
+      "table": "ingress.ipv4_lpm",
+      "match": {
+        "hdr.ipv4.dstAddr": ["10.0.1.1", 32]
+      },
+      "action_name": "ingress.set_nhop",
+      "action_params": {
+        "nhop_ipv4": "10.0.1.1",
+        "port": 1
+      }
+    },
+    {
+      "table": "ingress.ipv4_lpm",
+      "match": {
+        "hdr.ipv4.dstAddr": ["10.0.1.2", 32]
+      },
+      "action_name": "ingress.set_nhop",
+      "action_params": {
+        "nhop_ipv4": "10.0.1.2",
+        "port": 2
+      }
+    },
+    {
+      "table": "ingress.ipv4_lpm",
+      "match": {
+        "hdr.ipv4.dstAddr": ["10.0.1.3", 32]
+      },
+      "action_name": "ingress.set_nhop",
+      "action_params": {
+        "nhop_ipv4": "10.0.1.3",
+        "port": 3
+      }
+    },  
+    {
+      "table": "ingress.forward",
+      "match": {
+        "meta.ingress_metadata.nhop_ipv4": "10.0.1.1"
+      },
+      "action_name": "ingress.set_dmac",
+      "action_params": {
+        "dmac": "00:00:00:00:01:01"
+      }
+    },
+    {
+      "table": "ingress.forward",
+      "match": {
+        "meta.ingress_metadata.nhop_ipv4": "10.0.1.2"
+      },
+      "action_name": "ingress.set_dmac",
+      "action_params": {
+        "dmac": "00:00:00:00:01:02"
+      }
+    },
+    {
+      "table": "ingress.forward",
+      "match": {
+        "meta.ingress_metadata.nhop_ipv4": "10.0.1.3"
+      },
+      "action_name": "ingress.set_dmac",
+      "action_params": {
+        "dmac": "00:00:00:00:01:03"
+      }
+    }
+
+  ]
+}

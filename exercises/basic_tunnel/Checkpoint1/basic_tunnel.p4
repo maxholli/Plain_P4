@@ -13,11 +13,6 @@ typedef bit<9>  egressSpec_t;
 typedef bit<48> macAddr_t;
 typedef bit<32> ip4Addr_t;
 
-
-struct ingress_metadata_t {
-    bit<32> nhop_ipv4;
-}
-
 header ethernet_t {
     macAddr_t dstAddr;
     macAddr_t srcAddr;
@@ -64,10 +59,8 @@ header gtp_t {
 }
 
 struct metadata {
-    @name("ingress_metadata")
-    ingress_metadata_t   ingress_metadata;
+    /* empty */
 }
-
 
 struct headers {
     ethernet_t   ethernet;
@@ -147,58 +140,14 @@ control MyVerifyChecksum(inout headers hdr, inout metadata meta) {
 /*************************************************************************
 **************  I N G R E S S   P R O C E S S I N G   *******************
 *************************************************************************/
-control ingress(inout headers hdr, inout metadata meta, inout standard_metadata_t standard_metadata) {
-    action _drop() {
-	mark_to_drop(standard_metadata);
-    }
-    action set_nhop(bit<32> nhop_ipv4, bit<9> port) {
-	meta.ingress_metadata.nhop_ipv4 = nhop_ipv4;
-	standard_metadata.egress_spec = port;
-	hdr.ipv4.ttl = hdr.ipv4.ttl + 8w255;
-    }
-    action set_dmac(bit<48> dmac) {
-	hdr.ethernet.dstAddr = dmac;
-    }
-    table ipv4_lpm {
-	actions = {
-	    _drop;
-	    set_nhop;
-	    NoAction;
-	}
-	key = {
-	    hdr.ipv4.dstAddr: lpm;
-	}
-	size = 1024;
-	default_action = NoAction();
-    }
-    table forward {
-	actions = {
-	    set_dmac;
-	    _drop;
-	    NoAction;
-	}
-	key = {
-	    meta.ingress_metadata.nhop_ipv4: exact;
-	}
-	size = 512;
-	default_action = NoAction();
-    }
-    apply {
-	if (hdr.ipv4.isValid()) {
-	    ipv4_lpm.apply();
-	    forward.apply();
-	}
-    }
-}
 
-/*
 control MyIngress(inout headers hdr,
                   inout metadata meta,
                   inout standard_metadata_t standard_metadata) {
     action drop() {
         mark_to_drop(standard_metadata);
     }
-    
+    /*
     action eth_forward(macAddr_t dstAddr, egressSpec_t port) {
         standard_metadata.egress_spec = port;
         hdr.ethernet.srcAddr = hdr.ethernet.dstAddr;
@@ -217,7 +166,7 @@ control MyIngress(inout headers hdr,
         size = 1024;
         default_action = drop();
     }
-    
+    */
     action ipv4_forward(macAddr_t dstAddr, egressSpec_t port) {
         standard_metadata.egress_spec = port;
         hdr.ethernet.srcAddr = hdr.ethernet.dstAddr;
@@ -279,9 +228,9 @@ control MyIngress(inout headers hdr,
     }
     
     apply {
-        if (hdr.ethernet.isValid() && !hdr.udp.isValid()) {
+        if (hdr.ipv4.isValid() && !hdr.udp.isValid()) {
             // Process only non-tunneled IPv4 packets
-            eth_lpm.apply();
+            ipv4_lpm.apply();
         }
 
         if (hdr.udp.isValid()) {
@@ -291,11 +240,6 @@ control MyIngress(inout headers hdr,
         }
     }
 }
-*/
-
-
-
-
 
 /*************************************************************************
 ****************  E G R E S S   P R O C E S S I N G   *******************
