@@ -1,0 +1,119 @@
+{
+  "target": "bmv2",
+  "p4info": "build/mec.p4.p4info.txt",
+  "bmv2_json": "build/mec.json",
+  "table_entries": [
+    {
+      "table": "MyIngress.arp_out",
+      "match": {
+          "hdr.arp.protoDstAddr": "10.0.1.1"
+      },
+	"action_name": "MyIngress.set_arp_out",
+	"action_params": {
+	    "port": 1
+      }
+    },
+    {
+      "table": "MyIngress.arp_out",
+      "match": {
+          "hdr.arp.protoDstAddr": "10.0.1.2"
+      },
+	"action_name": "MyIngress.set_arp_out",
+	"action_params": {
+	    "port": 2
+      }
+    },
+    {
+      "table": "MyIngress.arp_out",
+      "match": {
+          "hdr.arp.protoDstAddr": "10.0.1.3"
+      },
+	"action_name": "MyIngress.set_arp_out",
+	"action_params": {
+	    "port": 3
+	}
+    },
+    {
+      "table": "MyIngress.ipv4_lpm",
+      "match": {
+        "hdr.ipv4.dstAddr": ["10.0.1.1", 32]
+      },
+      "action_name": "MyIngress.ipv4_forward",
+      "action_params": {
+        "dstAddr": "00:00:00:00:01:01",
+        "port": 1
+      }
+    },
+    {
+      "table": "MyIngress.ipv4_lpm",
+      "match": {
+        "hdr.ipv4.dstAddr": ["10.0.1.2", 32]
+      },
+      "action_name": "MyIngress.ipv4_forward",
+      "action_params": {
+        "dstAddr": "00:00:00:00:01:02",
+        "port": 2
+      }
+    },
+    {
+      "table": "MyIngress.ipv4_lpm",
+      "match": {
+        "hdr.ipv4.dstAddr": ["10.0.1.3", 32]
+      },
+      "action_name": "MyIngress.ipv4_forward",
+      "action_params": {
+        "dstAddr": "00:00:00:00:01:03",
+        "port": 3
+      }
+    },
+
+    {
+      "table": "MyIngress.udp_reroute_lpm",
+      "match": {
+        "hdr.ipv4_inner.srcAddr": ["45.45.0.11", 32]
+      },
+      "action_name": "MyIngress.udp_reroute",
+      "action_params": {
+        "dstAddr": "00:00:00:00:01:01",
+          "port": 1,
+	  "ipdst": "10.0.1.1"
+      }
+    },
+
+    {
+      "table": "MyIngress.udp_lpm",
+      "match": {
+        "hdr.ipv4.dstAddr": ["10.0.1.1", 32]
+      },
+      "action_name": "MyIngress.udp_forward",
+      "action_params": {
+        "dstAddr": "00:00:00:00:01:01",
+        "port": 1
+      }
+    },
+
+
+    {
+      "table": "MyIngress.udp_lpm",
+      "match": {
+        "hdr.ipv4.dstAddr": ["10.0.1.2", 32]
+      },
+      "action_name": "MyIngress.udp_forward",
+      "action_params": {
+        "dstAddr": "00:00:00:00:01:02",
+        "port": 2
+      }
+    },
+    {
+      "table": "MyIngress.udp_lpm",
+      "match": {
+        "hdr.ipv4.dstAddr": ["10.0.1.3", 32]
+      },
+      "action_name": "MyIngress.udp_forward",
+      "action_params": {
+        "dstAddr": "00:00:00:00:01:03",
+        "port": 3
+      }
+    }
+  ]
+}
